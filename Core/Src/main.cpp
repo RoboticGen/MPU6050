@@ -55,7 +55,9 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,6 +71,29 @@ static void MX_TIM2_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
+#ifdef __cplusplus
+}
+#endif
+
+FILE *uart_bt;
+uint8_t pData[50];
+uint16_t packetSize;
+uint8_t fifoBuffer[64];
+uint8_t mpuIntStatus;
+uint16_t fifoCount;
+
+// orientation/motion variables
+Quaternion q;
+VectorFloat gravity;    // [x, y, z]            gravity vector
+VectorInt16 aa;         // [x, y, z]            accel sensor measurements
+VectorInt16 aaReal; // [x, y, z]            gravity-free accel sensor measurements
+VectorInt16 aaWorld; // [x, y, z]            world-frame accel sensor measurements
+float euler[3];         // [psi, theta, phi]    Euler angle container
+float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+
+// packet structure for InvenSense teapot demo
+uint8_t teapotPacket[14] = { '$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00,
+        '\r', '\n' };
 
 /* USER CODE END PFP */
 
@@ -112,12 +137,46 @@ int main(void) {
     MX_ADC2_Init();
     MX_TIM3_Init();
     /* USER CODE BEGIN 2 */
+    HAL_Delay(200);
+    MPU6050 mpu6050 = MPU6050();
+    mpu6050.initialize();
+    mpu6050.dmpInitialize();
+    mpu6050.setDMPEnabled(true);
+
+    // get expected DMP packet size for later comparison
+    packetSize = mpu6050.dmpGetFIFOPacketSize();
 
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1) {
+        uint8_t mpuIntStatus = mpu6050.getIntStatus();
+        if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+            // reset so we can continue cleanly
+            mpu6050.resetFIFO();
+//            trace_puts("FIFO overflow!");
+
+            // otherwise, check for DMP data ready interrupt (this should happen frequently)
+        } else if (mpuIntStatus & 0x02) {
+            // wait for correct available data length, should be a VERY short wait
+            while (fifoCount < packetSize)
+                fifoCount = mpu6050.getFIFOCount();
+
+            mpu6050.getFIFOBytes(fifoBuffer, packetSize);
+
+            fifoCount -= packetSize;
+
+            int yaw, pitch, roll;
+            mpu6050.dmpGetQuaternion(&q, fifoBuffer);
+            mpu6050.dmpGetGravity(&gravity, &q);
+            mpu6050.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            yaw = (int) (ypr[0] * 180 / M_PI);
+            pitch = (int) (ypr[1] * 180 / M_PI);
+            roll = (int) (ypr[2] * 180 / M_PI);
+
+        }
+
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
