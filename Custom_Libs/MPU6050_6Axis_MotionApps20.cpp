@@ -100,7 +100,7 @@
 #define PRINTF printf
 #endif
 
-#include"diag/Trace.h"
+//#include"diag/Trace.h"
 
 #define HEX 1
 

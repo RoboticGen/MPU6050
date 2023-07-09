@@ -35,6 +35,7 @@ THE SOFTWARE.
 // MotionApps 2.0 DMP implementation, built using the MPU-6050EVB evaluation board
 #include "I2Cdev.h"
 #include "helper_3dmath.h"
+#include <stdio.h>
 
 /** Porting to STM32 for HAL library
  * */

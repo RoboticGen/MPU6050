@@ -40,11 +40,9 @@
 #include "stm32f1xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-#include <diag/Trace.h>
-//#include"MotorClass.h"
 #include <stdlib.h>
 #ifdef __cplusplus
-#include"MPU6050_6Axis_MotionApps20.h"
+#include "MPU6050_6Axis_MotionApps20.h"
 #endif
 
 /* USER CODE END Includes */
