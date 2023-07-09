@@ -37,6 +37,8 @@
 #ifndef _MPU6050_H_
 #define _MPU6050_H_
 
+#define MPU6050_INCLUDE_DMP_MOTIONAPPS20
+
 #include "I2Cdev.h"
 //#include <avr/pgmspace.h>
 
