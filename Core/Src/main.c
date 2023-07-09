@@ -532,17 +532,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BTN_OK_Pin */
-  GPIO_InitStruct.Pin = BTN_OK_Pin;
+  /*Configure GPIO pins : INTERRUPT_MPU_Pin BTN_OK_Pin */
+  GPIO_InitStruct.Pin = INTERRUPT_MPU_Pin|BTN_OK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BTN_OK_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_RIGHT_Pin BTN_LEFT_Pin */
-  GPIO_InitStruct.Pin = BTN_RIGHT_Pin|BTN_LEFT_Pin;
+  /*Configure GPIO pin : BTN_LEFT_Pin */
+  GPIO_InitStruct.Pin = BTN_LEFT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(BTN_LEFT_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
